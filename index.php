@@ -2,12 +2,12 @@
 
 /*
  * Plugin Name: Reorder Posts
- * Plugin URI:  https://wordpress.org/plugins/slide/
- * Description: Allows you to create presentations with the block editor.
- * Version:     0.0.39
- * Author:      Ella van Durpe
- * Author URI:  https://ellavandurpe.com
- * Text Domain: slide
+ * Plugin URI:  https://wordpress.org/plugins/Reorder-Posts/
+ * Description: Allows you to reorder the posts.
+ * Version:     0.0.1
+ * Author:      Zeng xiao luan
+ * Author URI:  https://zengxiaoluan.com
+ * Text Domain: reorder
  * License:     GPL-2.0+
  */
 
