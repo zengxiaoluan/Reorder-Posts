@@ -1,0 +1,25 @@
+{
+  "name": "Reorder-Posts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "prettier"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zengxiaoluan/Reorder-Posts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zengxiaoluan/Reorder-Posts/issues"
+  },
+  "homepage": "https://github.com/zengxiaoluan/Reorder-Posts#readme",
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.13.0",
+    "prettier": "^1.19.1"
+  }
+}
