@@ -19,9 +19,36 @@ if (!class_exists('WP_Reorder_Posts')) {
   {
     private $textDomain = 'reorder-wp-posts';
 
+    private $orderByOption = 'zxl_reorderby_post_order';
+
     private $orderOption = 'zxl_reorder_post_order';
 
     private $orderArray = array('DESC', 'ASC');
+
+    // Used to filter values.
+    private $allowed_keys = array(
+      'post_name',
+      'post_author',
+      'post_date',
+      'post_title',
+      'post_modified',
+      'post_parent',
+      'post_type',
+      'name',
+      'author',
+      'date',
+      'title',
+      'modified',
+      'parent',
+      'type',
+      'ID',
+      'menu_order',
+      'comment_count',
+      'rand',
+      'post__in',
+      'post_parent__in',
+      'post_name__in'
+    );
 
     private function basename()
     {
@@ -47,24 +74,17 @@ if (!class_exists('WP_Reorder_Posts')) {
     function reorder_posts($query)
     {
       if ($query->is_home() && $query->is_main_query()) {
-        $query->set('orderby', 'post_modified');
+        $orderBy = get_site_option($this->orderByOption);
+
+        if (in_array($orderBy, $this->allowed_keys)) {
+          $query->set('orderby', $orderBy);
+        }
 
         $order = get_site_option($this->orderOption);
         if (in_array($order, $this->orderArray)) {
           $query->set('order', $order);
         }
       }
-    }
-
-    public function update_wpmu_options()
-    {
-      $order = $_POST['zxl-reorder-post-order'];
-
-      update_site_option('zxl_reorder_post_order', $order);
-
-      wp_die(__('This feature is not enabled.', 'rename-wp-login'), '', array(
-        'response' => 403
-      ));
     }
 
     public static function uninstall()
@@ -89,26 +109,46 @@ if (!class_exists('WP_Reorder_Posts')) {
 
     public function orderbySelect()
     {
-      echo '<select id="zxl-reorder-posts-page"><option>1</option></select>';
-    }
+      $orderBy = get_site_option($this->orderByOption);
 
+      if (!is_string($orderBy)) {
+        $orderBy = 'post_date';
+      }
+      ?>
+<select id="<?php echo $this->orderByOption; ?>" name="<?php echo $this->orderByOption; ?>">
+<?php foreach ($this->allowed_keys as $key => $value) {
+  $selected = $value === $orderBy ? 'selected ' : '';
+  echo '<option ' .
+    $selected .
+    'value="' .
+    $value .
+    '">' .
+    $value .
+    '</option>';
+} ?>
+    </select>
+    <?php
+    }
     /**
      * Includes desc asc radio
      */
     public function orderRadio()
     {
       $order = get_site_option($this->orderOption);
-      var_dump($order);
+
+      if (!is_string($order)) {
+        $order = 'DESC';
+      }
       ?>
       <p>
         <label>
-          <input <?php echo $order === 'DESC'
+          <input id="<?php echo $this->orderOption; ?>" <?php echo $order === 'DESC'
             ? 'checked'
             : ''; ?> name="<?php echo $this->orderOption; ?>" type="radio" value="DESC">DESC
         </label><br>
 
         <label>
-          <input <?php echo $order === 'ASC'
+          <input id="<?php echo $this->orderOption; ?>" <?php echo $order === 'ASC'
             ? 'checked'
             : ''; ?> name="<?php echo $this->orderOption; ?>" type="radio" value="ASC">ASC
         </label>
@@ -135,8 +175,10 @@ if (!class_exists('WP_Reorder_Posts')) {
       );
 
       add_settings_field(
-        'zxl-reorder-posts-orderby',
-        '<label for="zxl-reorder-posts-orderby">' .
+        $this->orderByOption,
+        '<label for="' .
+          $this->orderByOption .
+          '">' .
           __('Order by', $this->textDomain) .
           '</label>',
         array($this, 'orderbySelect'),
@@ -145,8 +187,12 @@ if (!class_exists('WP_Reorder_Posts')) {
       );
 
       add_settings_field(
-        'zxl-reorder-post-order',
-        __('Order', $this->textDomain),
+        $this->orderOption,
+        '<label for="' .
+          $this->orderOption .
+          '">' .
+          __('Order', $this->textDomain) .
+          '</lable>',
         array($this, 'orderRadio'),
         $page,
         $section
@@ -154,9 +200,14 @@ if (!class_exists('WP_Reorder_Posts')) {
 
       if (isset($_POST[$this->orderOption]) && $pagenow === 'options.php') {
         $order = $_POST[$this->orderOption];
+        $orderBy = $_POST[$this->orderByOption];
 
         if (in_array($order, $this->orderArray)) {
           update_option($this->orderOption, $order);
+        }
+
+        if (in_array($orderBy, $this->allowed_keys)) {
+          update_option($this->orderByOption, $orderBy);
         }
       }
     }
